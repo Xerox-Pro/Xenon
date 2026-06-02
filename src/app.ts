@@ -209,6 +209,26 @@ socket.on('peer_joined', (data) => {
   }
 });
 
+socket.on('peer_left', (data) => {
+  if (data.role === 'android') {
+    statusMsg.innerText = 'Android device disconnected. Waiting...';
+    if (peerConnection) {
+      peerConnection.close();
+      peerConnection = null;
+    }
+    video.srcObject = null;
+    placeholder.style.opacity = '1';
+    
+    const badge = document.getElementById('streamingBadge');
+    const rtcHud = document.getElementById('rtcStateHud');
+    if (badge) {
+      badge.className = "px-2 py-0.5 rounded text-[10px] font-mono bg-slate-500/10 text-slate-400 border border-slate-500/20";
+      badge.innerText = "WAITING";
+    }
+    if (rtcHud) rtcHud.innerText = "WAITING";
+  }
+});
+
 async function initWebRTC() {
   peerConnection = new RTCPeerConnection(config);
 

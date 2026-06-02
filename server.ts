@@ -24,8 +24,21 @@ async function startServer() {
       socket.data.role = role;
       console.log(`Socket ${socket.id} joined as ${role}`);
       
+      // Notify the new client about existing clients in the room
+      const room = io.sockets.adapter.rooms.get('android-remote');
+      if (room) {
+        for (const clientId of room) {
+          if (clientId !== socket.id) {
+            const clientRole = io.sockets.sockets.get(clientId)?.data.role;
+            if (clientRole) {
+              socket.emit('peer_joined', { role: clientRole, id: clientId });
+            }
+          }
+        }
+      }
+
       // Notify the other peers in the room that a new participant joined
-      socket.to('android-remote').emit('peer_joined', { role });
+      socket.to('android-remote').emit('peer_joined', { role, id: socket.id });
     });
 
     // 2. WebRTC SDP Offer / Answer Exchange
@@ -50,6 +63,10 @@ async function startServer() {
 
     socket.on('disconnect', () => {
       console.log('Client disconnected:', socket.id);
+      const role = socket.data.role;
+      if (role) {
+        socket.to('android-remote').emit('peer_left', { role, id: socket.id });
+      }
     });
   });
 
