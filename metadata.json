@@ -1,0 +1,6 @@
+{
+  "name": "Android Remote Control",
+  "description": "WebRTC and Socket.io signaling server with a vanilla JS remote controller web client.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
